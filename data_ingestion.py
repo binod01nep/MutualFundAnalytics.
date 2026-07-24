@@ -89,11 +89,11 @@ def inspect_dataframe(name: str, df: pd.DataFrame) -> dict:
         anomalies.append(f"Duplicate rows: {dup_count}")
 
     if anomalies:
-        print("\n  ⚠ Anomalies detected:")
+        print("\n  [WARN] Anomalies detected:")
         for a in anomalies:
             print(f"    - {a}")
     else:
-        print("\n  ✓ No anomalies detected.")
+        print("\n  [OK] No anomalies detected.")
 
     return {
         "dataset"   : name,
@@ -199,14 +199,14 @@ def explore_fund_master(df: pd.DataFrame) -> None:
 
     # AMFI code structure
     print("\n  AMFI Scheme Code Structure:")
-    print("    • AMFI (Association of Mutual Funds in India) assigns a")
+    print("    - AMFI (Association of Mutual Funds in India) assigns a")
     print("      unique numeric Scheme Code to every mutual fund plan.")
-    print("    • Format  : 6-digit integer (e.g., 119551, 120503)")
-    print("    • Encoding: [AMC prefix][Plan ID][Option suffix]")
-    print("    • Used in : AMFI website, MFI API, BSE/NSE order routing.")
+    print("    - Format  : 6-digit integer (e.g., 119551, 120503)")
+    print("    - Encoding: [AMC prefix][Plan ID][Option suffix]")
+    print("    - Used in : AMFI website, MFI API, BSE/NSE order routing.")
     if code_col:
         sample = df[code_col].dropna().head(5).tolist()
-        print(f"    • Sample codes from dataset: {sample}")
+        print(f"    - Sample codes from dataset: {sample}")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -262,9 +262,9 @@ def validate_amfi_codes(fund_master: pd.DataFrame,
 
     if missing_in_nav:
         sample = sorted(missing_in_nav)[:10]
-        print(f"\n  ⚠ Sample missing codes (first 10): {sample}")
+        print(f"\n  [WARN] Sample missing codes (first 10): {sample}")
     else:
-        print("\n  ✓ All fund_master AMFI codes found in nav_history.")
+        print("\n  [OK] All fund_master AMFI codes found in nav_history.")
 
     # Append validation result to quality rows
     quality_rows.append({
@@ -312,7 +312,7 @@ def write_quality_report(quality_rows: list) -> None:
     with open(report_path, "w", encoding="utf-8") as f:
         f.writelines(lines)
 
-    print(f"\n  ✓ Report saved → {report_path}")
+    print(f"\n  [OK] Report saved -> {report_path}")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -346,7 +346,7 @@ def main() -> None:
               "skipping AMFI validation.")
         write_quality_report(quality_rows)
 
-    section("DAY 1 DATA INGESTION COMPLETE ✓")
+    section("DAY 1 DATA INGESTION COMPLETE")
     print("  Next step: Run live_nav_fetch.py to pull live NAV data.")
     print(f"{SEPARATOR}\n")
 

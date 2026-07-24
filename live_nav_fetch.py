@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 ============================================================
 Capstone Project I — Mutual Fund Analytics
@@ -134,10 +135,10 @@ def parse_and_save(data: dict, scheme_name: str, scheme_code: int) -> pd.DataFra
     out_path  = os.path.join(RAW_DIR, f"nav_{scheme_code}_{safe_name}.csv")
     df.to_csv(out_path, index=False)
 
-    print(f"    ✓ Saved  : {os.path.basename(out_path)}")
-    print(f"      Rows   : {len(df):,}")
-    print(f"      Period : {df['nav_date'].min().date()} → {df['nav_date'].max().date()}")
-    print(f"      Latest NAV: ₹ {df['nav_value'].iloc[0]:.4f}  "
+    print(f"    [OK] Saved  : {os.path.basename(out_path)}")
+    print(f"      Rows      : {len(df):,}")
+    print(f"      Period    : {df['nav_date'].min().date()} -> {df['nav_date'].max().date()}")
+    print(f"      Latest NAV: Rs {df['nav_value'].iloc[0]:.4f}  "
           f"({df['nav_date'].iloc[0].date()})")
 
     return df
@@ -190,11 +191,11 @@ def combine_and_save(all_dfs: list[pd.DataFrame]) -> None:
     out_path = os.path.join(RAW_DIR, "live_nav_all_schemes.csv")
     combined.to_csv(out_path, index=False)
 
-    print(f"  ✓ Combined file : {out_path}")
-    print(f"    Total rows    : {len(combined):,}")
-    print(f"    Schemes       : {combined['scheme_code'].nunique()}")
-    print(f"    Date range    : {combined['nav_date'].min().date()} "
-          f"→ {combined['nav_date'].max().date()}")
+    print(f"  [OK] Combined file : {out_path}")
+    print(f"    Total rows       : {len(combined):,}")
+    print(f"    Schemes          : {combined['scheme_code'].nunique()}")
+    print(f"    Date range       : {combined['nav_date'].min().date()} "
+          f"-> {combined['nav_date'].max().date()}")
 
     # Quick pivot: latest NAV per scheme
     latest = (
@@ -232,7 +233,7 @@ def main() -> None:
     # Combine
     combine_and_save(all_dfs)
 
-    section("LIVE NAV FETCH COMPLETE ✓")
+    section("LIVE NAV FETCH COMPLETE")
     print(f"  Raw CSVs saved to: {RAW_DIR}")
     print(f"  Next step: Run data_ingestion.py to load & validate all datasets.")
     print(f"{SEPARATOR}\n")
