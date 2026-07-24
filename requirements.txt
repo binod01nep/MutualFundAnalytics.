@@ -1,0 +1,32 @@
+# ============================================================
+# Capstone Project I — Mutual Fund Analytics
+# Requirements File
+# ============================================================
+
+# Core Data Processing
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.15.0
+
+# Database
+sqlalchemy>=2.0.0
+
+# HTTP Requests
+requests>=2.31.0
+
+# Scientific Computing
+scipy>=1.11.0
+
+# Jupyter Notebook
+jupyter>=1.0.0
+notebook>=7.0.0
+ipykernel>=6.25.0
+
+# Optional but useful
+openpyxl>=3.1.0        # Excel support
+python-dotenv>=1.0.0   # Environment variables
+tqdm>=4.65.0           # Progress bars

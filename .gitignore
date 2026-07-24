@@ -1,0 +1,51 @@
+# Capstone Project I — Mutual Fund Analytics
+# Day 1 .gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Data files (keep structure, ignore large raw data)
+# Comment out the next 2 lines if you WANT to push raw/processed data
+data/raw/*.csv
+data/processed/*.csv
+
+# Keep the live NAV combined file (small, useful reference)
+!data/raw/live_nav_all_schemes.csv
+
+# Environment / secrets
+.env
+*.env
+secrets.json
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Reports (keep .md, ignore heavy PDFs)
+reports/*.pdf
+reports/*.xlsx
