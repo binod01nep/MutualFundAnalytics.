@@ -30,3 +30,5 @@ ipykernel>=6.25.0
 openpyxl>=3.1.0        # Excel support
 python-dotenv>=1.0.0   # Environment variables
 tqdm>=4.65.0           # Progress bars
+streamlit
+
