@@ -89,44 +89,60 @@ elif page == "Fund Performance":
             scorecard = pd.DataFrame() # Fallback
 
     if not scorecard.empty:
+        # Merge with full fund metadata from DB to get category, plan, fund_house
+        df_fund_meta = load_query("SELECT amfi_code, category, fund_house, plan FROM dim_fund")
+        if 'category' not in scorecard.columns:
+            scorecard = scorecard.merge(df_fund_meta, on='amfi_code', how='left')
+
         # Slicers
         st.sidebar.markdown("### Filters")
-        selected_category = st.sidebar.multiselect("Select Category", options=scorecard['category'].unique(), default=scorecard['category'].unique()[:2])
+        categories = scorecard['category'].dropna().unique()
+        selected_category = st.sidebar.multiselect("Select Category", options=categories, default=list(categories[:3]))
         
-        filtered_scorecard = scorecard[scorecard['category'].isin(selected_category)]
+        filtered_scorecard = scorecard[scorecard['category'].isin(selected_category)] if selected_category else scorecard
+
+        # Composite_Score can be negative; ensure bubble size is always positive
+        filtered_scorecard = filtered_scorecard.copy()
+        min_score = filtered_scorecard['Composite_Score'].min()
+        filtered_scorecard['bubble_size'] = filtered_scorecard['Composite_Score'] - min_score + 1
         
         # Scatter Plot
         fig_scatter = px.scatter(
             filtered_scorecard, 
             x='Sharpe', 
             y='CAGR_3yr', 
-            size='Composite_Score', # using score as proxy for bubble size if AUM not merged
+            size='bubble_size',
             color='category',
             hover_name='scheme_name',
-            title="Return vs Risk (Size = Composite Score)"
+            hover_data={'Composite_Score': True, 'expense_ratio_pct': True, 'bubble_size': False},
+            title="Return vs Risk (Bubble Size = Composite Score)"
         )
         st.plotly_chart(fig_scatter, use_container_width=True)
         
         # Data Table
         st.markdown("### Fund Scorecard")
-        st.dataframe(filtered_scorecard[['scheme_name', 'category', 'Composite_Score', 'CAGR_3yr', 'Sharpe', 'expense_ratio_pct']].sort_values('Composite_Score', ascending=False))
+        display_cols = [c for c in ['scheme_name', 'category', 'Composite_Score', 'CAGR_3yr', 'Sharpe', 'expense_ratio_pct'] if c in filtered_scorecard.columns]
+        st.dataframe(filtered_scorecard[display_cols].sort_values('Composite_Score', ascending=False))
         
         # NAV Line vs Benchmark
         st.markdown("### NAV vs Benchmark Over Time")
-        selected_fund = st.selectbox("Select a Fund", options=filtered_scorecard['scheme_name'].unique())
-        
-        # Fetch NAV
-        nav_query = f"""
-            SELECT d.date_id, n.nav 
-            FROM fact_nav n 
-            JOIN dim_fund f ON n.amfi_code = f.amfi_code
-            JOIN dim_date d ON n.date = d.date_id
-            WHERE f.scheme_name = '{selected_fund}'
-        """
-        df_nav = load_query(nav_query)
-        if not df_nav.empty:
-            fig_nav = px.line(df_nav, x='date_id', y='nav', title=f"NAV Trend: {selected_fund}")
-            st.plotly_chart(fig_nav, use_container_width=True)
+        fund_options = filtered_scorecard['scheme_name'].dropna().unique()
+        if len(fund_options) > 0:
+            selected_fund = st.selectbox("Select a Fund", options=fund_options)
+            # Fetch NAV
+            nav_query = f"""
+                SELECT d.date_id, n.nav 
+                FROM fact_nav n 
+                JOIN dim_fund f ON n.amfi_code = f.amfi_code
+                JOIN dim_date d ON n.date = d.date_id
+                WHERE f.scheme_name = '{selected_fund}'
+            """
+            df_nav = load_query(nav_query)
+            if not df_nav.empty:
+                fig_nav = px.line(df_nav, x='date_id', y='nav', title=f"NAV Trend: {selected_fund}")
+                st.plotly_chart(fig_nav, use_container_width=True)
+        else:
+            st.info("No funds match the selected filters.")
     else:
         st.error("fund_scorecard.csv not found. Please run Day 4 analytics first.")
 
