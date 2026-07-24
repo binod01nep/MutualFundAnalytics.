@@ -68,13 +68,13 @@ if page == "Industry Overview":
         # AUM Trend
         df_aum_trend = load_query("SELECT strftime('%Y', aum_date) as year, SUM(aum_crore) as total_aum FROM fact_aum GROUP BY year")
         fig_trend = px.line(df_aum_trend, x='year', y='total_aum', title="Industry AUM Trend (2022-2025)", markers=True)
-        st.plotly_chart(fig_trend, use_container_width=True)
+        st.plotly_chart(fig_trend, width='stretch')
         
     with row1_col2:
         # AUM by AMC
         df_aum_amc = load_query("SELECT fund_house, SUM(aum_crore) as total_aum FROM fact_aum GROUP BY fund_house ORDER BY total_aum DESC LIMIT 10")
         fig_amc = px.bar(df_aum_amc, x='fund_house', y='total_aum', title="Top 10 AMC by AUM", color='fund_house')
-        st.plotly_chart(fig_amc, use_container_width=True)
+        st.plotly_chart(fig_amc, width='stretch')
 
 elif page == "Fund Performance":
     st.title("Fund Performance Analytics")
@@ -117,7 +117,7 @@ elif page == "Fund Performance":
             hover_data={'Composite_Score': True, 'expense_ratio_pct': True, 'bubble_size': False},
             title="Return vs Risk (Bubble Size = Composite Score)"
         )
-        st.plotly_chart(fig_scatter, use_container_width=True)
+        st.plotly_chart(fig_scatter, width='stretch')
         
         # Data Table
         st.markdown("### Fund Scorecard")
@@ -140,7 +140,7 @@ elif page == "Fund Performance":
             df_nav = load_query(nav_query)
             if not df_nav.empty:
                 fig_nav = px.line(df_nav, x='date_id', y='nav', title=f"NAV Trend: {selected_fund}")
-                st.plotly_chart(fig_nav, use_container_width=True)
+                st.plotly_chart(fig_nav, width='stretch')
         else:
             st.info("No funds match the selected filters.")
     else:
@@ -161,13 +161,13 @@ elif page == "Investor Analytics":
         # Bar chart: transaction amount by state
         state_amt = df_filtered.groupby('state')['amount_inr'].sum().reset_index()
         fig_state = px.bar(state_amt, x='state', y='amount_inr', title="Transaction Amount by State", color='state')
-        st.plotly_chart(fig_state, use_container_width=True)
+        st.plotly_chart(fig_state, width='stretch')
         
     with row1_col2:
         # Donut: SIP/Lumpsum/Redemption split
         type_split = df_filtered.groupby('transaction_type')['amount_inr'].sum().reset_index()
         fig_donut = px.pie(type_split, values='amount_inr', names='transaction_type', hole=0.5, title="Transaction Type Split")
-        st.plotly_chart(fig_donut, use_container_width=True)
+        st.plotly_chart(fig_donut, width='stretch')
         
     row2_col1, row2_col2 = st.columns(2)
     
@@ -175,14 +175,14 @@ elif page == "Investor Analytics":
         # Bar: age group vs avg SIP amount
         age_sip = df_filtered[df_filtered['transaction_type'] == 'SIP'].groupby('age_group')['amount_inr'].mean().reset_index()
         fig_age = px.bar(age_sip, x='age_group', y='amount_inr', title="Average SIP Amount by Age Group")
-        st.plotly_chart(fig_age, use_container_width=True)
+        st.plotly_chart(fig_age, width='stretch')
         
     with row2_col2:
         # Monthly transaction volume line
         df_filtered['month'] = pd.to_datetime(df_filtered['transaction_date']).dt.to_period('M').astype(str)
         vol_trend = df_filtered.groupby('month')['amount_inr'].sum().reset_index()
         fig_vol = px.line(vol_trend, x='month', y='amount_inr', title="Monthly Transaction Volume")
-        st.plotly_chart(fig_vol, use_container_width=True)
+        st.plotly_chart(fig_vol, width='stretch')
 
 elif page == "SIP & Market Trends":
     st.title("SIP & Market Trends")
@@ -214,7 +214,7 @@ elif page == "SIP & Market Trends":
     fig_dual.update_layout(title_text="SIP Inflows vs Market Trend")
     fig_dual.update_yaxes(title_text="SIP Inflows (INR)", secondary_y=False)
     fig_dual.update_yaxes(title_text="NIFTY 50 Close Value", secondary_y=True)
-    st.plotly_chart(fig_dual, use_container_width=True)
+    st.plotly_chart(fig_dual, width='stretch')
     
     row1_col1, row1_col2 = st.columns(2)
     with row1_col1:
@@ -223,13 +223,13 @@ elif page == "SIP & Market Trends":
         if not df_heat.empty:
             pivot_heat = df_heat.pivot(index='category', columns='month', values='inflow').fillna(0)
             fig_heat = px.imshow(pivot_heat, color_continuous_scale='Blues', aspect="auto")
-            st.plotly_chart(fig_heat, use_container_width=True)
+            st.plotly_chart(fig_heat, width='stretch')
             
     with row1_col2:
         st.markdown("### Top 5 Categories (Net Inflow)")
         cat_inflow = df_heat.groupby('category')['inflow'].sum().nlargest(5).reset_index()
         fig_cat = px.bar(cat_inflow, x='inflow', y='category', orientation='h', title="Top 5 Categories by Inflow")
-        st.plotly_chart(fig_cat, use_container_width=True)
+        st.plotly_chart(fig_cat, width='stretch')
 
 st.sidebar.markdown("---")
 st.sidebar.info("Dashboard created for Day 5 of the Capstone Project.")
